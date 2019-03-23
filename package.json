@@ -1,0 +1,16 @@
+{
+  "name": "boggle",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "websocket": "^1.0.28",
+    "nodemon": "^1.18.10"
+  },
+  "devDependencies": {
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "scripts": {
+    "start": "webpack --mode=development && nodemon src/index.js"
+  }
+}
