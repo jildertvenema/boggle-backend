@@ -1,4 +1,7 @@
 "use strict";
+
+const Session = require('./session')
+
 // Optional. You will see this name in eg. 'ps' or 'top' command
 process.title = 'boggle-server';
 // Port where we'll run the websocket server
@@ -9,16 +12,7 @@ var http = require('http');
 
 var clients = [];
 
-var rooms = [
-  {
-  roomName: 'New room',
-  clients: []
-},
-  {
-  roomName: 'second room',
-  clients: []
-}
-];
+var sessions = [new Session()];
 
 /**
  * HTTP server
@@ -43,15 +37,9 @@ wsServer.on('request', function(request) {
 
   var connection = request.accept(null, request.origin);
 
-  var index = clients.push({ connection, room: null }) - 1;
+  var index = clients.push(connection) - 1;
 
   console.log((new Date()) + ' Connection accepted.');
-  // send back chat history
-
-  connection.sendUTF(
-    JSON.stringify({ rooms: rooms.map(room => ({ roomName: room.roomName, count: room.clients.length })) })
-  )
-
 
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
@@ -59,7 +47,7 @@ wsServer.on('request', function(request) {
         const data = JSON.parse(message.utf8Data)
         const action = data.action && clientActions[data.action]
         if (action) {
-          action(clients.find(client => client.connection === connection) , data.options)
+          action(connection, data.options)
         } else {
           console.log(connection.remoteAddress)
           console.log(data.options)
@@ -74,34 +62,27 @@ wsServer.on('request', function(request) {
   });
 
 
-  const joinRoom = (client, options) => {
-    if (!options.roomName) {
-      return
-    }
-    const roomExists = rooms.find(room => room.roomName === options.roomName)
-    if (roomExists) {
-      roomExists.clients.push(client)
-      roomExists.clients.forEach(client => {
-        client.connection.sendUTF(
-          JSON.stringify({ room: { roomName: roomExists.roomName, count: roomExists.clients.length }})
-        )
-      })
-    client.room = roomExists
-    } else {
-      const newRoom = {
-        roomName: options.roomName,
-        clients: [client]
-      }
-      rooms.push(newRoom)
-      client.room = newRoom
-    }
-    console.log(rooms.length)
-    console.log(rooms)
+  const joinRoom = (connection, options) => {
+
+  }
+
+  const createRoom = (connection, options) => {
+    connection.sendUTF(
+      JSON.stringify({ board: sessions[0].board.board })
+    )
+  }
+
+  const checkWord = (connection, options) => {
+    connection.sendUTF(
+      JSON.stringify({ valid: sessions[0].board.wordIsValid(options.word)})
+    )
   }
 
 
   const clientActions = {
-    'joinRoom': joinRoom
+    'joinRoom': joinRoom,
+    'createRoom': createRoom,
+    'checkWord' : checkWord
   }
 
   // user disconnected
@@ -110,10 +91,5 @@ wsServer.on('request', function(request) {
         + connection.remoteAddress + " disconnected.");
     // remove user from the list of connected clients
     clients.splice(index, 1);
-    const client = clients.find(client => client.connection === connection)
-    console.log(client.room.clients)
-    if (client.room) {
-      client.room.clients = client.room.clients.filter(client => client.connection !== connection)
-    }
   });
 });
