@@ -1,11 +1,11 @@
 const Board = require('./board')
 
 class Session {
-    constructor (host) {
+    constructor (host, onEnding) {
         this.sessionID = Math.random().toString(36).substring(7)
         this.host = host
         this.player = null
-        this.board = new Board()
+        this.board = new Board(() => onEnding(this))
     }
 }
 

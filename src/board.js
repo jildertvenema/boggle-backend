@@ -4,16 +4,26 @@ const CheckWord = require('./check-word')
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
 
+const PLAY_TIME = 10
+
 class Board {
-    constructor() {
+    constructor(onEnding) {
         this.board = this.getRandomBoard()
         this.checkWord = CheckWord.getInstance()
+        this.startedTime = null
+        this.guessedWords = []
+        this.onEnding = onEnding
     }
 
+
+    startGame () {
+        this.startedTime = Date()
+        setTimeout(this.onEnding, PLAY_TIME * 1000)
+    }
     
     getRandomBoard() {
         const result = []
-        var possible = 'aaaabcdeeeefghiiiijklmnoooopqrstuuuuvwxyz'
+        var possible = 'aaaabbcddeeeeffgghhiiijjkkllmmnnooppqrsttuuuuvwxyz'
 
         for (let x = 0; x < GRID_SIZE; x++) {
             result.push([])
@@ -74,9 +84,30 @@ class Board {
         console.log('Not found in board')
     }
 
+    getPoints(word) {
+        switch(word.length) {
+            case 3:
+            case 4:
+                return 1;
+            case 5:
+                return 2
+            case 6:
+                return 3
+            case 7:
+                return 5
+            default:
+                return 11
+        }
+    }
+
     wordIsValid(word) {
         word = word.toLowerCase()
         console.log('Word :   ' + word)
+
+        if (this.guessedWords.includes(word)) {
+            return 0
+        }
+        this.guessedWords.push(word)
 
         if (
             word.length >= MIN_LETTERS &&
@@ -84,13 +115,12 @@ class Board {
             this.findWord(this.board, word) 
         ) {
             console.log("WORD FOUND!")
-            return true
+            return this.getPoints(word)
         }
         else {
             console.log('INVALID')
-            return false
+            return 0
         }
-
     } 
 }
 
