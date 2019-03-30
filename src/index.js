@@ -1,7 +1,7 @@
 "use strict";
 
-const Session = require('./session')
-const Player = require('./player')
+const Player = require('./modules/boggle/player')
+const GetAction = require('./modules/client-actions')
 
 // Optional. You will see this name in eg. 'ps' or 'top' command
 process.title = 'boggle-server';
@@ -12,8 +12,6 @@ var webSocketServer = require('websocket').server;
 var http = require('http');
 
 var clients = [];
-
-var sessions = [];
 
 /**
  * HTTP server
@@ -48,7 +46,9 @@ wsServer.on('request', function(request) {
     if (message.type === 'utf8') {
       try {
         const data = JSON.parse(message.utf8Data)
-        const action = data.action && clientActions[data.action]
+
+        // get action from modules/cient-actions
+        const action = data.action && GetAction(data.action)
         if (action) {
           action(connection, data.options, player)
         } else {
@@ -64,102 +64,16 @@ wsServer.on('request', function(request) {
     }
   });
 
-
-  const sendState = (connection, session) => {
-    const { sessionID, board} = session
-    connection.sendUTF(
-      JSON.stringify({ sessionID, board})
-    )
-  }
-
-  const notifySessionState = session => {
-    const { player, host } = session
-    if (player) { 
-      sendState(player.connection, session)
-    }
-    if (host) { 
-      sendState(host.connection, session)
-    }
-  }
-
-
-  const joinRoom = (connection, options, player) => {
-    const session = sessions.find(session => session.sessionID == options.sessionID)
-    if (session && session.player == null) {
-      
-      session.player = player
-      player.session = session
-
-      notifySessionState(session)
-
-    } else {
-      connection.sendUTF(
-        JSON.stringify({ error: 'Not found' })
-      )
-    }
-  }
-
-  const onEnding = session => {
-    const { player, host } = session
-    if (player) { 
-      player.connection.sendUTF(
-        JSON.stringify({ error: 'The end' })
-      )
-    }
-    if (host) { 
-      host.connection.sendUTF(
-        JSON.stringify({ error: 'The end' })
-      )
-    }
-  }
-
-  const createRoom = (connection, options, player) => {
-    player.isHost = true
-    const newSession = new Session(player, onEnding)
-    player.session = newSession
-
-    sessions.push(newSession)
-
-    connection.sendUTF(
-      JSON.stringify({ sessionID: newSession.sessionID })
-    )
-  }
-
-  const checkWord = (connection, options, player) => {
-    const session = player.session
-    let points = -1
-
-    if (session) {
-      points = session.board.wordIsValid(options.word)
-      player.points += points
-    }
-    
-    connection.sendUTF(
-      JSON.stringify({ valid: points, points: player.points})
-    )
-  }
-
-  const startGame = (connection, options, player) => {
-    const session = player.session
-    if (session) {
-      session.board.startGame()
-      notifySessionState(session)
-    }
-  }
-
-
-  const clientActions = {
-    'joinRoom': joinRoom,
-    'createRoom': createRoom,
-    'checkWord' : checkWord,
-    'startGame': startGame
-  }
-
   // user disconnected
   connection.on('close', function(connection) {
     console.log((new Date()) + " Peer "
         + connection.remoteAddress + " disconnected.");
     // remove user from the list of connected clients
     clients.splice(index, 1);
+
+    // delete session if player was host
+    if (player.isHost) {
+      GetAction('deleteSession')(connection, {}, player)
+    }
   });
 });

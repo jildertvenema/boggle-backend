@@ -4,21 +4,41 @@ const CheckWord = require('./check-word')
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
 
-const PLAY_TIME = 10
+const PLAY_TIME = 20
+const NUMBER_OF_ROUNDS = 3
+
 
 class Board {
     constructor(onEnding) {
         this.board = this.getRandomBoard()
         this.checkWord = CheckWord.getInstance()
-        this.startedTime = null
+        this.endTime = null
         this.guessedWords = []
         this.onEnding = onEnding
+        this.currentRound = 1
+        this.currentTurn = 'player'
     }
 
 
     startGame () {
-        this.startedTime = Date()
-        setTimeout(this.onEnding, PLAY_TIME * 1000)
+        if (this.currentRound < NUMBER_OF_ROUNDS) {
+        
+            // toggle turn
+            if (this.currentTurn === 'player') {
+                this.currentTurn = 'host'
+            } else {
+                this.currentTurn = 'player'
+            }
+
+            const date = new Date()
+            date.setSeconds(date.getSeconds() + PLAY_TIME)
+            this.endTime = date.getTime()
+
+            setTimeout(() => {
+                this.onEnding
+                this.currentRound += 1
+            }, PLAY_TIME * 1000)
+        }
     }
     
     getRandomBoard() {
