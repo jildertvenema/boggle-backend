@@ -6,7 +6,7 @@ const GetAction = require('./modules/client-actions')
 // Optional. You will see this name in eg. 'ps' or 'top' command
 process.title = 'boggle-server';
 // Port where we'll run the websocket server
-var webSocketsServerPort = 3200;
+var webSocketsServerPort = 1337;
 // websocket and http servers
 var webSocketServer = require('websocket').server;
 var http = require('http');
