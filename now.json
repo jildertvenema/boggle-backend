@@ -2,6 +2,6 @@
     "version": 2,
     "name": "nodejs",
     "builds": [
-        { "src": "src/index.js", "use": "@now/node" }
+        { "src": "src/index.js", "use": "@now/node", "config": { "maxLambdaSize": "20mb" }}
     ]
 }
