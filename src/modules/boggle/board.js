@@ -52,10 +52,10 @@ class Board {
 
             setTimeout(() => {
                 this.onEnding()
+                this.board = this.getRandomBoard()
                 // if it was the turn of the player, round up
                 if (this.currentTurn === 'player') {
                     this.currentRound += 1
-                    this.board = this.getRandomBoard()
                 }
             }, PLAY_TIME * 1000)
         }
