@@ -9,14 +9,14 @@ process.title = 'boggle-server';
 var webSocketsServerPort = 1337;
 // websocket and http servers
 var webSocketServer = require('websocket').server;
-var http = require('http');
+var https = require('https');
 
 var clients = [];
 
 /**
  * HTTP server
  */
-var server = http.createServer(function(request, response) {
+var server = https.createServer(function(request, response) {
   // Not important for us. We're writing WebSocket server,
   // not HTTP server
 });
