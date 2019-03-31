@@ -13,15 +13,21 @@ class Board {
         this.board = this.getRandomBoard()
         this.checkWord = CheckWord.getInstance()
         this.endTime = null
-        this.guessedWords = []
         this.onEnding = onEnding
         this.currentRound = 1
         this.currentTurn = 'player'
+        this.playTime = PLAY_TIME
+        this.totalRounds = NUMBER_OF_ROUNDS
+        
+        this.guessedWords = []
+        this.goodWords = []
+
+        this.previousRounds = []
     }
 
 
     startGame () {
-        if (this.currentRound < NUMBER_OF_ROUNDS) {
+        if (this.currentRound <= NUMBER_OF_ROUNDS) {
         
             // toggle turn
             if (this.currentTurn === 'player') {
@@ -34,9 +40,22 @@ class Board {
             date.setSeconds(date.getSeconds() + PLAY_TIME)
             this.endTime = date.getTime()
 
+
+            // reset and save words
+            this.guessedWords = []
+            this.goodWords = []
+
+            if (this.currentRound > 1) {
+                this.previousRounds.push({ goodWords: this.goodWords, guessedWords: this.guessedWords, playerType: this.currentTurn})
+            }
+            
+
             setTimeout(() => {
-                this.onEnding
-                this.currentRound += 1
+                this.onEnding()
+                // if it was the turn of the player, round up
+                if (this.currentTurn === 'player') {
+                    this.currentRound += 1
+                }
             }, PLAY_TIME * 1000)
         }
     }
@@ -135,7 +154,9 @@ class Board {
             this.findWord(this.board, word) 
         ) {
             console.log("WORD FOUND!")
-            return this.getPoints(word)
+            const points = this.getPoints(word)
+            this.goodWords.push({word, points})
+            return points
         }
         else {
             console.log('INVALID')
