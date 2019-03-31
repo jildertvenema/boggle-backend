@@ -13,6 +13,6 @@
   },
   
   "scripts": {
-    "start": "webpack --mode=development && nodemon src/index.js"
+    "start": "node src/index.js"
   }
 }
