@@ -4,7 +4,7 @@ const CheckWord = require('./check-word')
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
 
-const PLAY_TIME = 20
+const PLAY_TIME = 60
 const NUMBER_OF_ROUNDS = 3
 
 
@@ -55,6 +55,7 @@ class Board {
                 // if it was the turn of the player, round up
                 if (this.currentTurn === 'player') {
                     this.currentRound += 1
+                    this.board = this.getRandomBoard()
                 }
             }, PLAY_TIME * 1000)
         }
