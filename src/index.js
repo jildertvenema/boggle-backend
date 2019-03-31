@@ -6,7 +6,6 @@ const GetAction = require('./modules/client-actions')
 // Optional. You will see this name in eg. 'ps' or 'top' command
 process.title = 'boggle-server';
 // Port where we'll run the websocket server
-var webSocketsServerPort = 1337;
 // websocket and http servers
 var webSocketServer = require('websocket').server;
 var http = require('http');
@@ -21,9 +20,9 @@ var server = http.createServer(function(request, response) {
   // not HTTP server
 });
 
-server.listen(webSocketsServerPort, function() {
+server.listen(process.env.PORT || 1337, function() {
   console.log((new Date()) + " Server is listening on port "
-      + webSocketsServerPort);
+      + (process.env.PORT || 1337));
 });
 
 var wsServer = new webSocketServer({
