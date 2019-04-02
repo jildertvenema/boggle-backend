@@ -1,5 +1,6 @@
 
 const CheckWord = require('./check-word')
+const Dices = require('./dices')
 
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
@@ -63,11 +64,11 @@ class Board {
     
     getRandomBoard() {
         const result = []
-        var possible = 'aaaabbcddeeeeffgghhiiijjkkllmmnnooppqrsttuuuuvwxyz'
 
         for (let x = 0; x < GRID_SIZE; x++) {
             result.push([])
             for (let y = 0 ; y < GRID_SIZE; y++) {
+                const possible = Dices[x][y]
                 result[x][y] = possible.charAt(Math.floor(Math.random() * possible.length))
             }
         }    
