@@ -193,8 +193,9 @@ const notifySessionState = session => {
     const session = player.session
     player.name = options.name
 
-    sendToOpponent(session, player, {  opponentName: player.name })
-
+    if (session) {
+      sendToOpponent(session, player, {  opponentName: player.name })
+    }
   }
 
 module.exports = getAction = type => {
