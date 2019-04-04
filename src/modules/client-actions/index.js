@@ -1,5 +1,6 @@
 
 const Session = require('../boggle/session')
+const fs = require('fs');
 
 // manage sessions
 var sessions = []
@@ -61,9 +62,16 @@ const notifySessionState = session => {
 
 
   const getScores = (connection, options, player) => {
-    connection.sendUTF(
-        JSON.stringify({ scores })
-      )
+    if (scores.length === 0) {
+      fs.readFile('scores.json', 'utf8', function(err, contents) {
+        if (!err) {
+          scores = JSON.parse(contents).scores
+        }
+        connection.sendUTF(JSON.stringify({ scores }))
+    })
+    } else {
+      connection.sendUTF(JSON.stringify({ scores }))
+    }
   }
 
   const onEnding = session => {
@@ -170,9 +178,14 @@ const notifySessionState = session => {
 
           scores.push({
               sessionID: session.sessionID,
+              hostName: session.host.name,
               host: session.host.points,
+              playerName: session.player.name,
               player: session.player.points
           })
+
+          fs.appendFile('scores.json', JSON.stringify({ scores }))
+
       }
   }
 

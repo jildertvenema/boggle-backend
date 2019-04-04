@@ -12,50 +12,6 @@ var http = require('http');
 
 var clients = [];
 
-
-
-const readline = require('readline');
-const fs = require('fs');
-
-// create instance of readline
-// each instance is associated with single input stream
-let rl = readline.createInterface({
-    input: fs.createReadStream('src/Dutch.dic.txt')
-});
-
-const words = {}
-
-// event is emitted after each line
-rl.on('line', function(line) {
-  const index = line.indexOf('/')
-  const word = index > 0 ? line.substring(0, index).toLowerCase() : line.toLowerCase()
-
-  const prop = words.hasOwnProperty(word.charAt(0))
-
-  if (!prop) {
-    words[word.charAt(0)] = []
-  }
-
-  words[word.charAt(0)].push(word)
-
-});
-
-// end
-rl.on('close', function(line) {
-    // console.log(words.find(word => word === 'pro'));
-    fs.appendFile('woordenboek.json', JSON.stringify(words), function (err) {
-      if (err) {
-        // append failed
-      } else {
-        // done
-        console.log(Object.keys(words).map(key => `${key}: ${words[key].length} words`))
-      }
-    })
-    
-  });
-
-
-
 /**
  * HTTP server
  */
