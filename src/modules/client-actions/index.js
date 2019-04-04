@@ -180,11 +180,8 @@ const notifySessionState = session => {
     const session = player.session
     player.name = options.name
 
-    const nameProp = player.isHost ? 'hostName' : 'playerName'
+    sendToOpponent(session, player, {  opponentName: player.name })
 
-    if (session) {
-      notifyBoth(session, { [nameProp]: player.name })
-    }
   }
 
 module.exports = getAction = type => {
