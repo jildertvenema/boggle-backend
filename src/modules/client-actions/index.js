@@ -176,6 +176,17 @@ const notifySessionState = session => {
       }
   }
 
+  const setName = (connection, options, player) => {
+    const session = player.session
+    player.name = options.name
+
+    const nameProp = player.isHost ? 'hostName' : 'playerName'
+
+    if (session) {
+      notifyBoth(session, { [nameProp]: player.name })
+    }
+  }
+
 module.exports = getAction = type => {
     return clientActions[type]
 }
@@ -188,6 +199,7 @@ const clientActions = {
   'deleteSession': deleteSession,
   'getScores': getScores,
   'selectedLetters': selectedLetters,
-  'finishGame': finishGame
+  'finishGame': finishGame,
+  'setName': setName
 }
 

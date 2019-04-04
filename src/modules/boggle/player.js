@@ -4,6 +4,7 @@ class Player {
         this.isHost = false
         this.connection = connection
         this.session = null
+        this.name = null
     }
 }
 
