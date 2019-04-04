@@ -1,0 +1,11 @@
+{
+  scores: [
+  {
+      sessionID: "abc123",
+      hostName: "Jildert",
+      host: 9999,
+      playerName: "Pieter",
+      player: 1
+  }
+  ]
+}
