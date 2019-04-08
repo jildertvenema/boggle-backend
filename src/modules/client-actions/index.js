@@ -184,8 +184,8 @@ const notifySessionState = session => {
               player: session.player.points
           })
 
-          fs.appendFile('scores.json', JSON.stringify({ scores }))
-
+          fs.writeFileSync('scores.json',  JSON.stringify({ scores }), { encoding:'utf8', flag:'w' })
+          
       }
   }
 
