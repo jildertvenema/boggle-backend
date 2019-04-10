@@ -5,7 +5,7 @@ const Dices = require('./dices')
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
 
-const PLAY_TIME = 10
+const PLAY_TIME = 60
 const NUMBER_OF_ROUNDS = 3
 
 
