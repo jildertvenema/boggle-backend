@@ -1,6 +1,8 @@
 
 const Session = require('../boggle/session')
-const fs = require('fs');
+
+const mongo = require('./database')
+const db = mongo.getInstance()
 
 // manage sessions
 var sessions = []
@@ -63,12 +65,10 @@ const notifySessionState = session => {
 
   const getScores = (connection, options, player) => {
     if (scores.length === 0) {
-      fs.readFile('scores.json', 'utf8', function(err, contents) {
-        if (!err) {
-          scores = JSON.parse(contents).scores
-        }
+      db.read('boggle', 'scores', data => {
+        scores = data
         connection.sendUTF(JSON.stringify({ scores }))
-    })
+      })
     } else {
       connection.sendUTF(JSON.stringify({ scores }))
     }
@@ -177,7 +177,18 @@ const notifySessionState = session => {
     const session = player.session
       if (session) {
 
+        let newScore = null
+
         if (!session.board.singlePlayer) {
+
+            newScore = {
+                sessionID: session.sessionID,
+                hostName: session.host.name,
+                host: session.host.points,
+                playerName: session.player.name,
+                player: session.player.points
+            }
+
             sendToOpponent(session, player, {
               gameFinshed: true,
               board: session.board,
@@ -193,15 +204,6 @@ const notifySessionState = session => {
                 pointsOpponent: getOpponent(session, player).points
               })
             )
-
-
-            scores.push({
-                sessionID: session.sessionID,
-                hostName: session.host.name,
-                host: session.host.points,
-                playerName: session.player.name,
-                player: session.player.points
-            })
           } else {
             connection.sendUTF(
               JSON.stringify({ 
@@ -210,14 +212,16 @@ const notifySessionState = session => {
                 points: player.points
               })
             )
-            scores.push({
+            newScore = {
               sessionID: session.sessionID,
               hostName: session.host.name,
               host: session.host.points
-            })
+            }
           }
 
-          fs.writeFileSync('scores.json',  JSON.stringify({ scores }), { encoding:'utf8', flag:'w' })
+          scores.push(newScore)
+          db.write('boggle', 'scores', newScore)
+          // fs.writeFileSync('scores.json',  JSON.stringify({ scores }), { encoding:'utf8', flag:'w' })
 
       }
   }

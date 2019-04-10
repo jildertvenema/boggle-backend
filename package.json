@@ -5,7 +5,8 @@
   "dependencies": {
     "check-word": "^1.1.0",
     "websocket": "^1.0.28",
-    "nodemon": "^1.18.10"
+    "nodemon": "^1.18.10",
+    "mongodb": "^3.2.3"
   },
   "devDependencies": {
     "webpack": "^4.29.6",
