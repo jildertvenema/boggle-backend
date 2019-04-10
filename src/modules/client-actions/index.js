@@ -9,10 +9,10 @@ var scores = []
 
 const isCurrentTurn = (player, currentTurn) => player.isHost ? currentTurn === 'host' : currentTurn === 'player'
 
-const sendState = (connection, session, playerType) => {
-    const { sessionID, board } = session
+const sendState = (connection, session, playerType, board) => {
+    const { sessionID } = session
     connection.sendUTF(
-      JSON.stringify({ sessionID, readyToPlay: true, playTime: board.playTime, totalRounds: board.totalRounds, playerType})
+      JSON.stringify({ sessionID, readyToPlay: true, playTime: session.board.playTime, totalRounds: session.board.totalRounds, playerType, board})
     )
   }
 
@@ -91,6 +91,20 @@ const notifySessionState = session => {
     )
   }
 
+  const createSinglePlayerSession = (connection, options, player) => {
+    player.isHost = true
+    const newSession = new Session(player, onEnding)
+    player.session = newSession
+
+    newSession.board.currentTurn = 'host'
+    newSession.board.singlePlayer = true
+
+    sessions.push(newSession)
+
+    sendState(connection, newSession, 'host', newSession.board)
+
+  }
+
   const checkWord = (connection, options, player) => {
     const session = player.session
     let points = -1
@@ -98,9 +112,13 @@ const notifySessionState = session => {
     if (session) {
       points = session.board.wordIsValid(options.word)
       player.points += points
-    }
 
-    sendToOpponent(session, player, {  selectedLetters: [], pointsOpponent: player.points, board: session.board  })
+
+      if(!session.board.singlePlayer) {
+        sendToOpponent(session, player, {  selectedLetters: [], pointsOpponent: player.points, board: session.board  })
+      }
+
+    }
     
     connection.sendUTF(
       JSON.stringify({ valid: points, points: player.points, board: session.board })
@@ -159,33 +177,48 @@ const notifySessionState = session => {
     const session = player.session
       if (session) {
 
-          sendToOpponent(session, player, {
-            gameFinshed: true,
-            board: session.board,
-            points: getOpponent(session, player).points,
-            pointsOpponent: player.points
-          })
-
-          connection.sendUTF(
-            JSON.stringify({ 
+        if (!session.board.singlePlayer) {
+            sendToOpponent(session, player, {
               gameFinshed: true,
               board: session.board,
-              points: player.points,
-              pointsOpponent: getOpponent(session, player).points
+              points: getOpponent(session, player).points,
+              pointsOpponent: player.points
             })
-          )
+
+            connection.sendUTF(
+              JSON.stringify({ 
+                gameFinshed: true,
+                board: session.board,
+                points: player.points,
+                pointsOpponent: getOpponent(session, player).points
+              })
+            )
 
 
-          scores.push({
+            scores.push({
+                sessionID: session.sessionID,
+                hostName: session.host.name,
+                host: session.host.points,
+                playerName: session.player.name,
+                player: session.player.points
+            })
+          } else {
+            connection.sendUTF(
+              JSON.stringify({ 
+                gameFinshed: true,
+                board: session.board,
+                points: player.points
+              })
+            )
+            scores.push({
               sessionID: session.sessionID,
               hostName: session.host.name,
-              host: session.host.points,
-              playerName: session.player.name,
-              player: session.player.points
-          })
+              host: session.host.points
+            })
+          }
 
           fs.writeFileSync('scores.json',  JSON.stringify({ scores }), { encoding:'utf8', flag:'w' })
-          
+
       }
   }
 
@@ -211,6 +244,7 @@ const clientActions = {
   'getScores': getScores,
   'selectedLetters': selectedLetters,
   'finishGame': finishGame,
-  'setName': setName
+  'setName': setName,
+  'createSinglePlayerSession': createSinglePlayerSession
 }
 

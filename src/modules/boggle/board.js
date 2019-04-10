@@ -5,7 +5,7 @@ const Dices = require('./dices')
 const MIN_LETTERS = 3
 const GRID_SIZE = 5
 
-const PLAY_TIME = 60
+const PLAY_TIME = 10
 const NUMBER_OF_ROUNDS = 3
 
 
@@ -19,6 +19,7 @@ class Board {
         this.currentTurn = 'player'
         this.playTime = PLAY_TIME
         this.totalRounds = NUMBER_OF_ROUNDS
+        this.singlePlayer = false
         
         this.guessedWords = []
         this.goodWords = []
@@ -29,12 +30,14 @@ class Board {
 
     startGame () {
         if (this.currentRound <= NUMBER_OF_ROUNDS) {
-        
-            // toggle turn
-            if (this.currentTurn === 'player') {
-                this.currentTurn = 'host'
-            } else {
-                this.currentTurn = 'player'
+    
+            if (!this.singlePlayer) {
+                // toggle turn
+                if (this.currentTurn === 'player') {
+                    this.currentTurn = 'host'
+                } else {
+                    this.currentTurn = 'player'
+                }
             }
 
             const date = new Date()
@@ -55,7 +58,7 @@ class Board {
                 this.onEnding()
                 this.board = this.getRandomBoard()
                 // if it was the turn of the player, round up
-                if (this.currentTurn === 'player') {
+                if (this.currentTurn === 'player' || this.singlePlayer) {
                     this.currentRound += 1
                 }
             }, PLAY_TIME * 1000)
