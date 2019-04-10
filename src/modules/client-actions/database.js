@@ -31,8 +31,8 @@ class MongoDatabaseClient {
           console.log(err)
           return
         }
+        this.client.close();
       })
-      this.client.close();
     });
   }
 }

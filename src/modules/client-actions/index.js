@@ -8,7 +8,6 @@ const db = mongo.getInstance()
 var sessions = []
 var scores = []
 
-
 const isCurrentTurn = (player, currentTurn) => player.isHost ? currentTurn === 'host' : currentTurn === 'player'
 
 const sendState = (connection, session, playerType, board) => {
