@@ -3,7 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 class MongoDatabaseClient {
   constructor(uri) {
-    this.client = new MongoClient(uri)
+    this.client = new MongoClient(uri, { useNewUrlParser: true })
   }
 
   read(db, collectionName, onFulfilled) {
