@@ -172,6 +172,15 @@ const notifySessionState = session => {
       }
   }
 
+  
+  db.write('boggle', 'scores', {
+    sessionID: 'test23123',
+    hostName: 'Je moeder',
+    host: 31
+  })
+
+
+
   const finishGame = (connection, options, player) => {
     const session = player.session
       if (session) {

@@ -3,7 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 
 class MongoDatabaseClient {
   constructor(uri) {
-    this.client = new MongoClient(uri, { useNewUrlParser: true })
+    this.client = new MongoClient(uri)
   }
 
   read(db, collectionName, onFulfilled) {
@@ -42,7 +42,7 @@ var DataBaseSingleton = (function () {
   var instance
 
   function createInstance() {
-      var object = new MongoDatabaseClient('mongodb+srv://mongo_user:7DFhfhnXxcLedXi7@cluster0-izty0.mongodb.net/test?retryWrites=true')
+      var object = new MongoDatabaseClient('mongodb+srv://mongo_user:7DFhfhnXxcLedXi7@cluster0-izty0.mongodb.net')
       return object;
   }
 
