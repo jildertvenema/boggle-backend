@@ -4,8 +4,9 @@ const MongoClient = require('mongodb').MongoClient;
 class MongoDatabaseClient {
   constructor(uri) {
     const options = {
-      server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
-      replset: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }
+      useMongoClient: true,
+      keepAlive: 300000, 
+      connectTimeoutMS: 30000
     }
     this.client = new MongoClient(uri, options)
   }
