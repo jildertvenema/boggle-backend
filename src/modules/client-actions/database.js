@@ -42,7 +42,7 @@ var DataBaseSingleton = (function () {
   var instance
 
   function createInstance() {
-      var object = new MongoDatabaseClient('mongodb+srv://mongo_user:7DFhfhnXxcLedXi7@cluster0-izty0.mongodb.net?retryWrites=true')
+      var object = new MongoDatabaseClient('mongodb+srv://mongo_user:7DFhfhnXxcLedXi7@cluster0-izty0.mongodb.net/')
       return object;
   }
 
