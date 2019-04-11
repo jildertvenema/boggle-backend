@@ -14,7 +14,7 @@ class MongoDatabaseClient {
       }
       const collection = this.client.db(db).collection(collectionName)
       
-      collection.find().toArray().then(data => onFulfilled(data))
+      collection.find().toArray().then(data => onFulfilled(data)).catch(console.log)
       this.client.close();
     });
   }
