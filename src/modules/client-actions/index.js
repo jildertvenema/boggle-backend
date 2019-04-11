@@ -2,7 +2,6 @@
 const Session = require('../boggle/session')
 
 const mongo = require('./database')
-const db = mongo.getInstance()
 
 // manage sessions
 var sessions = []
@@ -64,7 +63,7 @@ const notifySessionState = session => {
 
   const getScores = (connection, options, player) => {
     if (scores.length === 0) {
-      db.read('boggle', 'scores', data => {
+      mongo.getInstance().read('boggle', 'scores', data => {
         scores = data
         connection.sendUTF(JSON.stringify({ scores }))
       })
@@ -219,7 +218,7 @@ const notifySessionState = session => {
           }
 
           scores.push(newScore)
-          db.write('boggle', 'scores', newScore)
+          mongo.getInstance().write('boggle', 'scores', newScore)
           
           sessions.forEach(session => !session.board.readyToPlay && notifyBoth(session, { scores }))
       }
