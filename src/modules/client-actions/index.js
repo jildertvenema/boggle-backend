@@ -220,8 +220,8 @@ const notifySessionState = session => {
 
           scores.push(newScore)
           db.write('boggle', 'scores', newScore)
-          // fs.writeFileSync('scores.json',  JSON.stringify({ scores }), { encoding:'utf8', flag:'w' })
-
+          
+          sessions.forEach(session => !session.board.readyToPlay && notifyBoth(session, { scores }))
       }
   }
 

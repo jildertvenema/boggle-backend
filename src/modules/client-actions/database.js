@@ -20,18 +20,18 @@ class MongoDatabaseClient {
   }
 
   write(db, collectionName, item) {
-    this.client.connect(err => {
+    this.client.connect((err, clientdb) => {
       if (err){
         console.log(err)
         return
       }
-      const collection = this.client.db(db).collection(collectionName)
+      const collection = clientdb.db(db).collection(collectionName)
       collection.insertOne(item, err => {
         if (err){
           console.log(err)
           return
         }
-        this.client.close();
+        clientdb.close();
       })
     });
   }
