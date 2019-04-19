@@ -3,7 +3,14 @@ const MongoClient = require('mongodb').MongoClient;
 
 class MongoDatabaseClient {
   constructor(uri) {
-    this.client = new MongoClient(uri, { useNewUrlParser: true })
+    const options = {
+      poolSize: 20,
+      socketTimeoutMS: 480000,
+      keepAlive: 300000,
+      ssl: true,
+      sslValidate: false
+    }
+    this.client = new MongoClient(uri, options)
   }
 
   read(db, collectionName, onFulfilled) {
@@ -14,25 +21,25 @@ class MongoDatabaseClient {
       }
       const collection = this.client.db(db).collection(collectionName)
       
-      collection.find().toArray().then(data => onFulfilled(data))
+      collection.find().toArray().then(data => onFulfilled(data)).catch(console.log)
       this.client.close();
     });
   }
 
   write(db, collectionName, item) {
-    this.client.connect(err => {
+    this.client.connect((err, clientdb) => {
       if (err){
         console.log(err)
         return
       }
-      const collection = this.client.db(db).collection(collectionName)
+      const collection = clientdb.db(db).collection(collectionName)
       collection.insertOne(item, err => {
         if (err){
           console.log(err)
           return
         }
+        clientdb.close();
       })
-      this.client.close();
     });
   }
 }
